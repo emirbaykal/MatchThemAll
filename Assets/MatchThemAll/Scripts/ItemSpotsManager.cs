@@ -22,6 +22,9 @@ public class ItemSpotsManager : MonoBehaviour
     [SerializeField] private float animationDuration;
     [SerializeField] private LeanTweenType animationEasing;
 
+    [Header(" Actions ")] 
+    public static Action<List<Item>> mergeStarted;
+
      
     private void Awake()
     {
@@ -193,15 +196,14 @@ public class ItemSpotsManager : MonoBehaviour
         itemMergeDatas.Remove(itemMergeData.itemName);
 
         for (int i = 0; i < items.Count; i++)
-        {
             items[i].Spot.Clear();
-            Destroy(items[i].gameObject);
-        }
 
         if (itemMergeDatas.Count <= 0)
             isBusy = false;
         else
            MoveAllItemsToTheLeft(HandleAllItemsMovedToTheLeft);
+
+        mergeStarted?.Invoke(items);
     }
 
     private void MoveAllItemsToTheLeft(Action completeCallback)
