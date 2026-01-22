@@ -233,7 +233,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemSpotsParent: {fileID: 1120996097}
   itemLocalPositionOnSpot: {x: 0, y: 0.03, z: 0}
-  itemLocalScaleOnSpot: {x: 0.5, y: 0.5, z: 0.5}
   animationDuration: 0.2
   animationEasing: 7
 --- !u!1001 &111259338
