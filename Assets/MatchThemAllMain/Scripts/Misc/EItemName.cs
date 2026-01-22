@@ -2,8 +2,10 @@ namespace MatchThemAll.Scripts
 {
     public enum EItemName
     {
-        Sphere,
+        BluePotion,
         Cube,
-        Cylinder,
+        Hamburger,
+        Apple,
+        Mushroom,
     }
 }

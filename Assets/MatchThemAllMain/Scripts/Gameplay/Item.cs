@@ -10,6 +10,12 @@ public class Item : MonoBehaviour
     [Header(" Data ")] 
     [SerializeField] private EItemName itemName;
     public EItemName ItemName => itemName;
+    
+    [SerializeField] private Vector3 itemLocalScaleOnSpot;
+    public  Vector3 ItemLocalScaleOnSpot => itemLocalScaleOnSpot;
+
+    [SerializeField] private Sprite icon;
+    public Sprite Icon => icon;
 
     private ItemSpot spot;
     public ItemSpot Spot => spot;

@@ -12,7 +12,7 @@ public class ItemSpotsManager : MonoBehaviour
     
     [Header(" Settings ")] 
     [SerializeField] private Vector3 itemLocalPositionOnSpot;
-    [SerializeField] private Vector3 itemLocalScaleOnSpot;
+    //[SerializeField] private Vector3 itemLocalScaleOnSpot;
     private bool isBusy;
     
     [Header(" Data ")]
@@ -114,11 +114,11 @@ public class ItemSpotsManager : MonoBehaviour
     private void MoveItemToSpot(Item item, ItemSpot targetSpot, Action completeCallback)
     {
         targetSpot.Populate(item);
-
+        
         //Move animations
         LeanTween.moveLocal(item.gameObject, itemLocalPositionOnSpot, animationDuration)
             .setEase(animationEasing);
-        LeanTween.scale(item.gameObject, itemLocalScaleOnSpot, animationDuration)
+        LeanTween.scale(item.gameObject, item.ItemLocalScaleOnSpot, animationDuration)
             .setEase(animationEasing);
         LeanTween.rotateLocal(item.gameObject, Vector3.zero, animationDuration)
             .setEase(animationEasing)
