@@ -1,12 +1,16 @@
 using System;
+using MatchThemAll.Scripts;
 using UnityEngine;
 
-public class LevelManager : MonoBehaviour
+public class LevelManager : MonoBehaviour, IGameStateListener
 {
+    public static LevelManager instance;
+    
     [Header(" Data ")]
     [SerializeField] private Level[] levels;
     private const string levelKey = "LevelReached";
     private int levelIndex;
+    public Item[] Items => currentLevel.GetItems();
 
     [Header(" Settings ")] 
     private Level currentLevel;
@@ -17,12 +21,13 @@ public class LevelManager : MonoBehaviour
     private void Awake()
     {
         LoadData();
-    }
 
-    private void Start()
-    {
-        SpawnLevel();
+        if (instance == null)
+            instance = this;
+        else
+            Destroy(gameObject);
     }
+    
 
     private void SpawnLevel()
     {
@@ -43,5 +48,17 @@ public class LevelManager : MonoBehaviour
     private void SaveData()
     {
         PlayerPrefs.SetInt(levelKey, levelIndex);
+    }
+
+    public void GameStateChangedCallback(EGameState gameState)
+    {
+        if(gameState == EGameState.GAME)
+            SpawnLevel();
+        else if (gameState == EGameState.LEVELCOMPLETE)
+        {
+            levelIndex++;
+            SaveData();
+        }
+            
     }
 }

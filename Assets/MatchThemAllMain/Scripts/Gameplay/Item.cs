@@ -1,5 +1,6 @@
 using System;
 using MatchThemAll.Scripts;
+using MatchThemAllMain.Scripts.ScriptableObjects.Items;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -7,15 +8,9 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class Item : MonoBehaviour
 {
-    [Header(" Data ")] 
-    [SerializeField] private EItemName itemName;
-    public EItemName ItemName => itemName;
-    
-    [SerializeField] private Vector3 itemLocalScaleOnSpot;
-    public  Vector3 ItemLocalScaleOnSpot => itemLocalScaleOnSpot;
-
-    [SerializeField] private Sprite icon;
-    public Sprite Icon => icon;
+    [Header(" Data ")]
+    [SerializeField] private ItemData itemData;
+    public ItemData ItemData => itemData;
 
     private ItemSpot spot;
     public ItemSpot Spot => spot;

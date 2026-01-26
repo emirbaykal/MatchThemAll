@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using MatchThemAll.Scripts;
+using MatchThemAllMain.Scripts.Managers;
+using MatchThemAllMain.Scripts.ScriptableObjects.Items;
 using UnityEngine;
 
 public class ItemSpotsManager : MonoBehaviour
@@ -16,7 +18,7 @@ public class ItemSpotsManager : MonoBehaviour
     private bool isBusy;
     
     [Header(" Data ")]
-    private Dictionary<EItemName,ItemMergeData> itemMergeDatas = new Dictionary<EItemName,ItemMergeData>();
+    private Dictionary<ItemData,ItemMergeData> itemMergeDatas = new Dictionary<ItemData,ItemMergeData>();
     
     [Header(" Animation Settings")]
     [SerializeField] private float animationDuration;
@@ -63,7 +65,7 @@ public class ItemSpotsManager : MonoBehaviour
 
     private void HandleItemClicked(Item item)
     {
-        if (itemMergeDatas.ContainsKey(item.ItemName))
+        if (itemMergeDatas.ContainsKey(item.ItemData))
             HandleItemMergeDataFound(item);
         else
             MoveItemToFirstFreeSpot(item);
@@ -73,14 +75,14 @@ public class ItemSpotsManager : MonoBehaviour
     {
         ItemSpot idealSpot = GetIdealSpotFor(item);
 
-        itemMergeDatas[item.ItemName].Add(item);
+        itemMergeDatas[item.ItemData].Add(item);
         
         TryMoveItemToIdealSpot(item, idealSpot);
     }
 
     private ItemSpot GetIdealSpotFor(Item item)
     {
-        List<Item> items = itemMergeDatas[item.ItemName].items;
+        List<Item> items = itemMergeDatas[item.ItemData].items;
         List<ItemSpot> itemSpots = new List<ItemSpot>();
 
         for (int i = 0; i < items.Count; i++)
@@ -118,7 +120,7 @@ public class ItemSpotsManager : MonoBehaviour
         //Move animations
         LeanTween.moveLocal(item.gameObject, itemLocalPositionOnSpot, animationDuration)
             .setEase(animationEasing);
-        LeanTween.scale(item.gameObject, item.ItemLocalScaleOnSpot, animationDuration)
+        LeanTween.scale(item.gameObject, item.ItemData.itemLocalScaleOnSpot, animationDuration)
             .setEase(animationEasing);
         LeanTween.rotateLocal(item.gameObject, Vector3.zero, animationDuration)
             .setEase(animationEasing)
@@ -186,17 +188,17 @@ public class ItemSpotsManager : MonoBehaviour
         
         if(!checkForMerge)
             return;
-        if (itemMergeDatas[item.ItemName].CanMergeItems())
-            MergeItems(itemMergeDatas[item.ItemName]);
+        if (itemMergeDatas[item.ItemData].CanMergeItems())
+            MergeItems(item.ItemData, itemMergeDatas[item.ItemData]);
         else
             CheckForGameOver();
     }
 
-    private void MergeItems(ItemMergeData itemMergeData)
+    private void MergeItems(ItemData itemData, ItemMergeData itemMergeData)
     {
         List<Item> items = itemMergeData.items;
         //Remove the item merge data from dictionary
-        itemMergeDatas.Remove(itemMergeData.itemName);
+        itemMergeDatas.Remove(itemData);
 
         for (int i = 0; i < items.Count; i++)
             items[i].Spot.Clear();
@@ -256,14 +258,14 @@ public class ItemSpotsManager : MonoBehaviour
     private void CheckForGameOver()
     {
         if (GetFreeSpot() == null)
-            Debug.Log("Game Over");
+            GameManager.instance.SetGameState(EGameState.GAMEOVER);
         else
             isBusy = false;
     }
 
     private void CreateItemMergeData(Item item)
     {
-        itemMergeDatas.Add(item.ItemName, new ItemMergeData(item));
+        itemMergeDatas.Add(item.ItemData, new ItemMergeData(item));
     }
 
     private ItemSpot GetFreeSpot()

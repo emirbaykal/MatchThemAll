@@ -1,36 +1,49 @@
 using System;
 using System.Collections.Generic;
 using MatchThemAll.Scripts;
+using MatchThemAllMain.Scripts.Managers;
 using TMPro;
 using UnityEngine;
 
 public class GoalManager : MonoBehaviour
 {
+    public static GoalManager instance;
+    
     [Header(" Elements ")] 
     [SerializeField] private Transform goalCardsParent;
     [SerializeField] private GoalCard goalCardPrefab;
     
     [Header(" Data ")]
     private ItemLevelData[] goals;
+    public ItemLevelData[] Goals => goals;
+    
     private List<GoalCard> goalCards = new List<GoalCard>();
     
     private void Awake()
     {
         LevelManager.levelSpawned += OnLevelSpawned;
         ItemSpotsManager.itemPickedUp += OnItemPickedUp;
+        PowerupManager.itemPickedUp += OnItemPickedUp;
+
+        if (instance == null)
+            instance = this;
+        else
+            Destroy(gameObject);
     }
 
     private void OnDestroy()
     {
         LevelManager.levelSpawned -= OnLevelSpawned;
         ItemSpotsManager.itemPickedUp -= OnItemPickedUp;
+        PowerupManager.itemPickedUp -= OnItemPickedUp;
+
     }
 
     private void OnItemPickedUp(Item item)
     {
         for (int i = 0; i < goals.Length; i++)
         {
-            if(!goals[i].itemPrefab.ItemName.Equals(item.ItemName))
+            if(!goals[i].itemPrefab.ItemData.Equals(item.ItemData))
                 continue;
 
             goals[i].amount--;
@@ -59,15 +72,13 @@ public class GoalManager : MonoBehaviour
     {
         GoalCard cardInstance = Instantiate(goalCardPrefab, goalCardsParent);
         
-        cardInstance.Configure(goal.amount, goal.itemPrefab.Icon);
+        cardInstance.Configure(goal.amount, goal.itemPrefab.ItemData.icon);
         
         goalCards.Add(cardInstance);
     }
 
     private void CompleteGoal(int i)
     {
-        Debug.Log("GoalComplete : " + goals[i].itemPrefab.ItemName);
-
         goalCards[i].Complete();
 
         CheckForLevelComplete();
@@ -80,8 +91,8 @@ public class GoalManager : MonoBehaviour
             if(goals[i].amount > 0)
                 return;
         }
-        
-        Debug.Log("Level Complete");
+
+        GameManager.instance.SetGameState(EGameState.LEVELCOMPLETE);
     }
 
     
