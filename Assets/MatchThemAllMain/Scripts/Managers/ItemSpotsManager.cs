@@ -4,9 +4,12 @@ using MatchThemAll.Scripts;
 using MatchThemAllMain.Scripts.Managers;
 using MatchThemAllMain.Scripts.ScriptableObjects.Items;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class ItemSpotsManager : MonoBehaviour
 {
+    public static  ItemSpotsManager instance;
+    
     [Header(" Elements ")] 
     [SerializeField] private Transform itemSpotsParent;
     private ItemSpot[] spots;
@@ -31,23 +34,43 @@ public class ItemSpotsManager : MonoBehaviour
      
     private void Awake()
     {
+        if (instance == null)
+            instance = this;
+        else
+            Destroy(gameObject);
+        
         InputManager.itemClicked += OnItemClicked;
+        PowerupManager.itemBackToGame += OnItemBackToGame;
         
         StoreSpots();
     }
 
     private void OnDestroy()
     {
+        PowerupManager.itemBackToGame -= OnItemBackToGame;
         InputManager.itemClicked -= OnItemClicked;
     }
-    
-    
+
+    private void OnItemBackToGame(Item releasedItem)
+    {
+        if(!itemMergeDatas.ContainsKey(releasedItem.ItemData))
+            return;
+        
+        //Remove the item from the "itemMergeDatas"
+        itemMergeDatas[releasedItem.ItemData].Remove(releasedItem);
+        
+        //Check if we have more items with the same
+        //If not remove the "itemMergeDatas" entry
+        if(itemMergeDatas[releasedItem.ItemData].items.Count <= 0)
+            itemMergeDatas.Remove(releasedItem.ItemData);
+        
+    }
+
+
     private void OnItemClicked(Item item)
     {
         if (isBusy)
-        {
-            
-        }
+            return;
 
         if (!IsFreeSpotAvailable())
         {
@@ -294,4 +317,22 @@ public class ItemSpotsManager : MonoBehaviour
         }
         return false;
     }
+
+    public ItemSpot GetRandomOccupiedSpot()
+    {
+        List<ItemSpot> occupiedSpots = new List<ItemSpot>();
+
+        foreach (var spot in spots)
+        {
+            if(spot.IsEmpty())
+                continue;
+            
+            occupiedSpots.Add(spot);
+        }
+
+        if (occupiedSpots.Count <= 0)
+            return null;
+        
+        return occupiedSpots[Random.Range(0, occupiedSpots.Count)];
+    } 
 }

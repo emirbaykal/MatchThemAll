@@ -6,7 +6,7 @@ namespace MatchThemAllMain.Scripts.Gameplay.Powerup
     public enum EPowerupType
     {
         Vacuum = 0,
-        Spring = 1,
+        Hammer = 1,
         Fan = 2,
         FreezeGun = 3
     }

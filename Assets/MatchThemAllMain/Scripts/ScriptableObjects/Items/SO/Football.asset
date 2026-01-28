@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Football
   m_EditorClassIdentifier: 
   itemID: football
-  itemLocalScaleOnSpot: {x: 0.3, y: 0.3, z: 0.3}
+  itemLocalScaleOnSpot: {x: 0.2, y: 0.2, z: 0.2}
   itemPrefab: {fileID: 2293238563987567130, guid: 6d8322349b42cd54ea284cbd7eb02ef8, type: 3}
   icon: {fileID: 21300028, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}

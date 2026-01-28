@@ -2,10 +2,13 @@ using System;
 using MatchThemAll.Scripts;
 using MatchThemAllMain.Scripts.Managers;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class TimerManager : MonoBehaviour, IGameStateListener
 {
+    public static TimerManager instance;
+    
     [Header(" Elements ")]
     [SerializeField] private TextMeshProUGUI timerText;
 
@@ -13,6 +16,11 @@ public class TimerManager : MonoBehaviour, IGameStateListener
 
     private void Awake()
     {
+        if (instance == null)
+            instance = this;
+        else
+            Destroy(this);
+        
         LevelManager.levelSpawned += OnLevelSpawned;
     }
 
@@ -67,7 +75,12 @@ public class TimerManager : MonoBehaviour, IGameStateListener
 
     private void StopTimer()
     {
-        CancelInvoke(nameof(UpdateTimer));
+        CancelInvoke();
+    }
 
+    public void FreezeTimer()
+    {
+        StopTimer();
+        Invoke(nameof(StartTimer), 10);
     }
 }

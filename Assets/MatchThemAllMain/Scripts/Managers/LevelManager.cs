@@ -11,7 +11,8 @@ public class LevelManager : MonoBehaviour, IGameStateListener
     private const string levelKey = "LevelReached";
     private int levelIndex;
     public Item[] Items => currentLevel.GetItems();
-
+    public Transform ItemParent => currentLevel.ItemParent;
+    
     [Header(" Settings ")] 
     private Level currentLevel;
     

@@ -13,6 +13,12 @@ public class PowerupManager : MonoBehaviour
     [SerializeField] private Vacuum vacuum;
     [SerializeField] private Transform vacuumSuckPosition;
 
+    [Header(" Hammer Elements ")] 
+    [SerializeField] private Hammer hammer;
+    
+    [Header(" Fan Settings ")] 
+    [SerializeField] private float fanMagnitude;
+    
     [Header(" Settings ")] 
     private bool isBusy;
     private int vacuumItemsToCollect;
@@ -20,16 +26,13 @@ public class PowerupManager : MonoBehaviour
     
     [Header(" Actions ")] 
     public static Action<Item> itemPickedUp;
-
+    public static Action<Item> itemBackToGame;
+ 
     [Header(" Data ")] 
     [SerializeField] private int initialPUCount;
 
     private int vacuumPUCount;
-
-    private void Update()
-    {
-        Debug.Log(isBusy);
-    }
+    
 
     private void Awake()
     {
@@ -56,9 +59,14 @@ public class PowerupManager : MonoBehaviour
                 HandleVacuumClicked();
                 UpdateVacuumVisuals();
                 break;
+            case EPowerupType.Hammer:
+                HammerPowerup();
+                break;
         }
     }
 
+    #region Vacuum
+    
     private void HandleVacuumClicked()
     {
         if (vacuumPUCount <= 0)
@@ -157,24 +165,78 @@ public class PowerupManager : MonoBehaviour
         Destroy(item.gameObject);
     }
 
-    private ItemLevelData? GetGreatestGoal(ItemLevelData[] goals)
-    {
-        return goals.OrderByDescending(g => g.amount).FirstOrDefault();
-    }
-
     private void UpdateVacuumVisuals()
     {
         vacuum.UpdateVisuals(vacuumPUCount);
     }
+    private ItemLevelData? GetGreatestGoal(ItemLevelData[] goals)
+    {
+        return goals.OrderByDescending(g => g.amount).FirstOrDefault();
+    }
     
+    #endregion
+
+    #region Spring
+
+    [Button]
+
+    public void HammerPowerup()
+    {
+        ItemSpot spot = ItemSpotsManager.instance.GetRandomOccupiedSpot();
+        
+        if(spot == null)
+            return;
+        
+        isBusy = true;
+
+        Item itemToRelease = spot.Item;
+        
+        spot.Clear();
+
+        itemToRelease.UnassignSpot();
+        itemToRelease.EnablePhysics();
+
+        itemToRelease.transform.parent = LevelManager.instance.ItemParent;
+        itemToRelease.transform.localPosition = Vector3.up * 3f;
+        itemToRelease.transform.localScale = Vector3.one;
+        
+        itemBackToGame?.Invoke(itemToRelease);
+        
+        hammer.Play();
+
+    }
+
+    #endregion
+
+    #region Fan
+
+    [Button]
+    public void FanPowerup()
+    {
+        Item[] items = LevelManager.instance.Items;
+
+        foreach (var item in items)
+            item.ApplyRandomForce(fanMagnitude);
+    }
+
+    #endregion
+
+    #region Freeze
+
+    [Button]
+    public void FreezePowerup()
+    {
+        TimerManager.instance.FreezeTimer();
+    }
+
+    #endregion
+
     private void LoadData()
     {
         vacuumPUCount = PlayerPrefs.GetInt("VacuumCount", initialPUCount);
 
         UpdateVacuumVisuals();
     }
-
-    
 
     private void SaveData()
     {
